@@ -1,5 +1,4 @@
 // Express - Minimal server
-
 const express = require("express");
 const app = express();
 const port = 3001;
@@ -20,7 +19,8 @@ admin.initializeApp({
 });
 const db = admin.firestore();
 
-// HTTP OPERATIONS
+// API
+
 const hamsters = db.collection("data");
 
 app.get("/", (req, res) => {
@@ -28,10 +28,14 @@ app.get("/", (req, res) => {
 });
 
 app.get("/hamsters", async (req, res) => {
-  // Get ALL documents
-  const snapshot = await hamsters.get();
-  const list = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-  res.send(list);
+  // Get ALL Hamsters
+  try {
+    const snapshot = await hamsters.get();
+    const list = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    res.send(list);
+  } catch (err) {
+    res.status(500);
+  }
 });
 
 app.get("/hamsters/random", async (req, res) => {
@@ -39,4 +43,20 @@ app.get("/hamsters/random", async (req, res) => {
   const snapshot = await hamsters.get();
   const list = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
   res.send(list[Math.floor(Math.random() * 41)]);
+});
+
+app.get("/hamsters/:id", async (req, res) => {
+  // Get a SPECIFIC Hamster
+
+  try {
+    const docRef = db.collection("data").doc(req.params.id);
+    const doc = await docRef.get();
+    if (!doc.exists) {
+      res.status(404).send("ERROR: 404");
+    } else {
+      res.send(doc.data());
+    }
+  } catch (err) {
+    res.status(500).send("ERROR: " + err);
+  }
 });
