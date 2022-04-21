@@ -13,6 +13,7 @@ const { initializeApp } = require("firebase-admin/app");
 const admin = require("firebase-admin");
 
 const serviceAccount = require("./script/json_to_firestore/backendapi-ba770-firebase-adminsdk-ou27w-b8a584b687.json");
+const { firestore } = require("firebase-admin");
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
@@ -60,19 +61,34 @@ app.get("/hamsters/:id", async (req, res) => {
 });
 
 // Add(POST) a new hamster
-app.post("/hamsters", (req, res) => {
+app.post("/hamsters", async (req, res) => {
+  const docRef = await hamsters.add({
+    games: 0,
+    wins: 0,
+    favFood: "Pizza",
+    imgName: 0,
+    age: 2,
+    defeats: 0,
+    name: "Alex",
+    loves: "Fighting",
+  });
+  res.send("New hamster is created! The new ID is " + docRef.id);
+});
+
+// EDIT a specific hamster
+app.put("/hamsters/:id", (req, res) => {
   try {
-    const res = hamsters.add({
+    db.collection("data").doc(req.params.id).set({
       games: 0,
       wins: 0,
       favFood: "Pizza",
       imgName: 0,
       age: 2,
       defeats: 0,
-      name: "Alex",
+      name: "Altair",
       loves: "Fighting",
     });
-    res.send("New hamster added");
+    res.sendStatus(200);
   } catch (err) {
     res.status(500).send("ERROR: " + err);
   }
@@ -82,7 +98,7 @@ app.post("/hamsters", (req, res) => {
 app.delete("/hamsters/:id", (req, res) => {
   try {
     db.collection("data").doc(req.params.id).delete();
-    res.send("Hamster is removed");
+    res.sendStatus(200);
   } catch (err) {
     res.status(500).send("ERROR: " + err);
   }
