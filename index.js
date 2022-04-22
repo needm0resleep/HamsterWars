@@ -1,7 +1,7 @@
 // Express - Minimal server
 const express = require("express");
 const app = express();
-const port = 3001;
+const port = process.env.PORT || 1337; // funkar på Heroku
 
 app.listen(port, () => {
   console.log("Server is listening on port " + port);
