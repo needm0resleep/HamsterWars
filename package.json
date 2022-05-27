@@ -1,13 +1,21 @@
 {
-  "name": "Hamsterwars",
+  "name": "hamsterwars",
   "version": "1.0.0",
-  "description": "Individuell backend-API \u001b[D uppgift",
+  "description": "Specification for assignment Hamster Wars, including data, with a script for evaluating if a submission follows the spec. Examinating assignment in fullstack dev course.",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "test-frontend": "npx http-server ./evaluate/"
   },
+  "keywords": [
+    "express",
+    "REST",
+    "API",
+    "backend",
+    "frontend",
+    "fullstack"
+  ],
   "author": "Kristine Dela Cruz Uson FEU21",
   "license": "ISC",
   "dependencies": {

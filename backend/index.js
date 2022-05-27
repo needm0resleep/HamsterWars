@@ -1,9 +1,11 @@
 // Express - Minimal server
 const express = require("express");
 const app = express();
-const port = process.env.PORT || 1337;
 const cors = require("cors");
+const port = process.env.PORT || 1337;
 app.use(cors());
+app.use(express.static("frontend"));
+app.use(express.json());
 
 app.listen(port, () => {
   console.log("Server is listening on port " + port);
@@ -72,36 +74,43 @@ app.post("/hamsters", async (req, res) => {
     imgName: 0,
     age: 2,
     defeats: 1,
-    name: "rebecca",
+    name: "Altair",
     loves: "Fighting",
   });
   res.status(200).send({ id: docRef.id });
 });
 
 // EDIT a specific hamster
-app.put("/hamsters/:id", (req, res) => {
+app.put("/hamsters/:id", async (req, res) => {
   try {
-    db.collection("data").doc(req.params.id).set({
-      games: 0,
-      wins: 0,
-      favFood: "Pizza",
-      imgName: 0,
-      age: 2,
-      defeats: 0,
-      name: "Altair",
-      loves: "Fighting",
-    });
-    res.sendStatus(200);
+    const docRef = await db.collection("data").doc(req.params.id);
+    const doc = await docRef.get();
+    if (!doc.exists) {
+      res.status(404).send("ERROR: Hamster does not exist :'(");
+    } else {
+      try {
+        await docRef.update(req.body);
+        res.sendStatus(200);
+      } catch (err) {
+        res.status(400).send("No changes were added");
+      }
+    }
   } catch (err) {
     res.status(500).send("ERROR: " + err);
   }
 });
 
 // DELETE a specific hamster
-app.delete("/hamsters/:id", (req, res) => {
+app.delete("/hamsters/:id", async (req, res) => {
   try {
-    db.collection("data").doc(req.params.id).delete();
-    res.sendStatus(200);
+    const docRef = db.collection("data").doc(req.params.id);
+    const doc = await docRef.get();
+    if (!doc.exists) {
+      res.status(404).send("ERROR: Hamster does not exist :'(");
+    } else {
+      await db.collection("data").doc(req.params.id).delete();
+      res.sendStatus(200);
+    }
   } catch (err) {
     res.status(500).send("ERROR: " + err);
   }
